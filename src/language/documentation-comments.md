@@ -11,22 +11,22 @@ public class MyClass {}
 class MyClass {}
 ```
 
-In Rust [doc comments] provide the equivalent to JSDoc documentation comments. Documentation comments in Rust use Markdown syntax. [`rustdoc`][rustdoc] is the documentation compiler for Rust code and is usually invoked through [`cargo doc`][cargo doc], which compiles the comments into documentation. For example:
+C lacks a standardized way to generate documentation from comments like JSDoc, developers can adopt tools like Doxygen to extract structured comments and generate documentation from C code. Doxygen interprets specially formatted comments to produce documentation.Doxygen serves as the tool for generating documentation. In C, Doxygen uses a specific syntax to create documentation comments. For instance, in C using Doxygen:
 
-```rust
-/// This is a doc comment for `MyStruct`.
-struct MyStruct;
+```c
+/* 
+ * This is a comment for the MyStruct struct.
+ */
+struct MyStruct {
+    // Members of the struct
+};
 ```
 
-In JSDoc, the equivalent to `cargo doc` is `jsdoc`.
+In JSDoc, the equivalent to Doxygen is `jsdoc`.
 
 See also:
 
 - [How to write documentation]
 - [Documentation tests]
 
-[doc comments]: https://doc.rust-lang.org/rust-by-example/meta/doc.html
-[rustdoc]: https://doc.rust-lang.org/rustdoc/index.html
-[cargo doc]: https://doc.rust-lang.org/cargo/commands/cargo-doc.html
-[How to write documentation]: https://doc.rust-lang.org/rustdoc/how-to-write-documentation.html
-[documentation tests]: https://doc.rust-lang.org/rustdoc/write-documentation/documentation-tests.html
+[How to write documentation]: https://www.doxygen.nl/manual/docblocks.html

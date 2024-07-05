@@ -18,44 +18,34 @@ class Fraction {
     }
 }
 
-console.log(Fraction.add(new Fraction(5, 4), new Fraction(1, 2)).toString());  // 输出 "14/8"
+console.log(Fraction.add(new Fraction(5, 4), new Fraction(1, 2)).toString());  // Output "14/8"
 ```
 
-In Rust, many operators [can be overloaded via traits][ops.rs]. This is possible because operators are syntactic sugar for method calls. For example, the `+` operator in `a + b` calls the `add` method (see [operator overloading]):
+In C, operator overloading is not directly supported. However, it is possible to achieve similar functionality by defining functions that mimic operator behavior.
 
-```rust
-use std::{fmt::{Display, Formatter, Result}, ops::Add};
+```c
+#include <stdio.h>
 
-struct Fraction {
-    numerator: i32,
-    denominator: i32,
+typedef struct {
+    int numerator;
+    int denominator;
+} Fraction;
+
+Fraction addFractions(Fraction f1, Fraction f2) {
+    Fraction result;
+    result.numerator = f1.numerator * f2.denominator + f2.numerator * f1.denominator;
+    result.denominator = f1.denominator * f2.denominator;
+    return result;
 }
 
-impl Display for Fraction {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        f.write_fmt(format_args!("{}/{}", self.numerator, self.denominator))
-    }
+int main() {
+    Fraction f1 = {5, 4};
+    Fraction f2 = {1, 2};
+    
+    Fraction result = addFractions(f1, f2);
+    
+    printf("%d/%d\n", result.numerator, result.denominator); // Output: 14/8
+    
+    return 0;
 }
-
-impl Add<Fraction> for Fraction {
-    type Output = Fraction;
-
-    fn add(self, rhs: Fraction) -> Fraction {
-        Fraction {
-            numerator: self.numerator * rhs.denominator + rhs.numerator * self.denominator,
-            denominator: self.denominator * rhs.denominator,
-        }
-    }
-}
-
-fn main() {
-    println!(
-        "{}",
-        Fraction { numerator: 5, denominator: 4 } + Fraction { numerator: 1, denominator: 2 }
-    ); // 14/8
-}
-
 ```
-
-[ops.rs]: https://doc.rust-lang.org/core/ops/
-[operator overloading]: https://doc.rust-lang.org/rust-by-example/trait/ops.html

@@ -1,6 +1,68 @@
 # Threading
 
-The Rust standard library supports threading, synchronisation and concurrency. Also the language itself and the standard library do have basic support for the concepts, a lot of additional functionality is provided by crates and will not be covered in this document.
+The C standard library supports threading, synchronisation and concurrency. Also the language itself and the standard library do have basic support for the concepts, a lot of additional functionality is provided by third party libraries and will not be covered in this document.
+
+For threading in C, the pthread library is commonly used:
+
+To compile the code, use the -pthread flag with gcc:
+`gcc -pthread main.c -o main`
+
+
+```c
+#include <stdio.h>
+#include <pthread.h>
+
+void *thread_function(void *arg) {
+    // Thread logic here
+    return NULL;
+}
+
+int main() {
+    pthread_t thread_id;
+    pthread_create(&thread_id, NULL, thread_function, NULL);
+    
+    // Main program logic here
+    
+    pthread_join(thread_id, NULL);
+    
+    return 0;
+}
+```
+
+For synchronization and concurrency in C, mechanisms like mutexes and semaphores can be utilized. Here is a basic example using a mutex for synchronization:
+
+```c
+#include <stdio.h>
+#include <pthread.h>
+
+pthread_mutex_t mutex;
+
+void *thread_function(void *arg) {
+    pthread_mutex_lock(&mutex);
+    
+    // Critical section
+    
+    pthread_mutex_unlock(&mutex);
+    return NULL;
+}
+
+int main() {
+    pthread_t thread_id;
+    pthread_mutex_init(&mutex, NULL);
+    
+    pthread_create(&thread_id, NULL, thread_function, NULL);
+    
+    // Main program logic here
+    
+    pthread_join(thread_id, NULL);
+    
+    pthread_mutex_destroy(&mutex);
+    
+    return 0;
+}
+```
+To compile the code, use the -pthread flag with gcc:
+`gcc -pthread main.c -o main`
 
 JavaScript is a single-threaded scripting language that does not support multithreading.
 
@@ -39,18 +101,24 @@ const worker = new Worker(URL.createObjectURL(new Blob([`
 worker.postMessage('Hello from a thread!');
 ```
 
-The same code in Rust would be as follows:
+The same code in C would be as follows:
 
-```rust
-use std::thread;
+```c
+#include <stdio.h>
+#include <pthread.h>
 
-fn main() {
-    let thread = thread::spawn(|| println!("Hello from a thread!"));
-    thread.join().unwrap(); // wait for thread to finish
+void *thread_function(void *arg) {
+    printf("Hello from a thread!\n");
+    return NULL;
+}
+
+int main() {
+    pthread_t thread;
+    pthread_create(&thread, NULL, thread_function, NULL);
+    pthread_join(thread, NULL); // wait for thread to finish
+    return 0;
 }
 ```
-
-Creating and initializing a thread object and starting a thread are two different actions in JavaScript whereas in Rust both happen at the same time with `thread::spawn`.
 
 In JavaScript, it's possible to send data as an argument to a thread:
 ```js
@@ -86,26 +154,26 @@ t.Join();
 Console.WriteLine($"Phrase: {data}");
 ```-->
 
-In Rust, there is no variation of `thread::spawn` that does the same. Instead, the data is passed to the thread via a closure:
+In C, the data is passed to the thread:
 
-```rust
-use std::thread;
+```c
+#include <stdio.h>
+#include <pthread.h>
+#include <string.h>
 
-fn main() {
-    let data = String::from("Hello");
-    let handle = thread::spawn(move || {
-        let mut data = data;
-        data.push_str(" World!");
-        data
-    });
-    println!("Phrase: {}", handle.join().unwrap());
+void* thread_function(void* arg) {
+    char* data = (char*)arg;
+    strcat(data, " World!");
+    return data;
+}
+
+int main() {
+    char data[20] = "Hello";
+    pthread_t thread;
+    pthread_create(&thread, NULL, thread_function, (void*)data);
+    void* result;
+    pthread_join(thread, &result);
+    printf("Phrase: %s\n", (char*)result);
+    return 0;
 }
 ```
-
-A few things to note:
-
-- The `move` keyword is _required_ to _move_ or pass the ownership of `data` to the closure for the thread. Once this is done, it's no longer legal to continue to use the `data` variable of `main`, in `main`. If that is needed, `data` must be copied or cloned (depending on what the type of the value supports).
-
-- Rust thread can return values, which becomes the return value of the `join` method.
-
-- It is possible to also pass data to the JavaScript thread via a closure, like the Rust example, but the JavaScript version does not need to worry about ownership since the memory behind the data will be reclaimed by the GC once no one is referencing it anymore.

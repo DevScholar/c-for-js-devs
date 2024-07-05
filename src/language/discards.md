@@ -8,11 +8,10 @@ There are multiple contexts where to apply this, for example as a basic example,
 city.getCityInformation(cityName);
 ```
 
-In Rust, [ignoring the result of an expression][rust-ignoring-values] looks
-identical:
+In C, discarding the result of a function call is typically achieved by assigning the result to a variable and not using that variable further. In C, casting the result to (void) indicates to the compiler that the return value is intentionally being ignored. 
 
-```rust
-_ = city.get_city_information(city_name);
+```c
+(void)city_get_city_information(city_name);
 ```
 
 Discards are also applied for deconstructing "tuples" in JavaScript:
@@ -21,25 +20,42 @@ Discards are also applied for deconstructing "tuples" in JavaScript:
 const [_, second] = ["first", "second"];
 ```
 
-and, identically, in Rust:
+In C, tuple deconstruction like in JavaScript can be achieved using a similar approach. However, C does not have built-in tuple types like JavaScript. To mimic tuple deconstruction, one can use arrays or structures:
 
-```rust
-let (_, second) = ("first", "second");
+```c
+#include <stdio.h>
+
+int main() {
+    char* values[] = {"first", "second"};
+    char* second = values[1];
+
+    printf("Second value: %s\n", second);
+
+    return 0;
+}
 ```
 
-In addition to destructuring tuples, Rust offers [destructuring][rust-destructuring] of structs and enums using `..`, where `..` stands for the remaining part of a type:
+To achieve struct destructuring similar to Rust in C, one can use a similar approach by defining a struct and then accessing its members selectively. 
 
-```rust
+```c
+#include <stdio.h>
+
 struct Point {
-    x: i32,
-    y: i32,
-    z: i32,
-}
+    int x;
+    int y;
+    int z;
+};
 
-let origin = Point { x: 0, y: 0, z: 0 };
+int main() {
+    struct Point origin = {0, 0, 0};
 
-match origin {
-    Point { x, .. } => println!("x is {}", x), // x is 0
+    switch (origin.x) {
+        case 0:
+            printf("x is %d\n", origin.x);
+            break;
+    }
+
+    return 0;
 }
 ```
 
@@ -58,24 +74,26 @@ const result = (_ => {
 
 console.log(result);
 ```
-<!--
-```csharp
-_ = ("first", "second") switch
-{
-    ("first", _) => "first element matched",
-    (_, _) => "first element did not match"
-};
-```
--->
-and again, in Rust:
 
-```rust
-_ = match ("first", "second")
-{
-    ("first", _) => "first element matched",
-    (_, _) => "first element did not match"
-};
-```
+and again, in C:
 
-[rust-ignoring-values]: https://doc.rust-lang.org/stable/book/ch18-03-pattern-syntax.html#ignoring-values-in-a-pattern
-[rust-destructuring]: https://doc.rust-lang.org/reference/patterns.html#destructuring
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    const char* first = "first";
+    const char* second = "second";
+    const char* result;
+
+    if (strcmp(first, "first") == 0) {
+        result = "first element matched";
+    } else {
+        result = "first element did not match";
+    }
+
+    printf("%s\n", result);
+
+    return 0;
+}
+```

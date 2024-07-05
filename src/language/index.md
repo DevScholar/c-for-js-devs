@@ -1,3 +1,3 @@
 # Language
 
-This sections compares JavaScript and Rust language features.
+This sections compares JavaScript and C language features.

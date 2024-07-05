@@ -1,10 +1,10 @@
 # Conversion and Casting
 
-Rust is statically-typed at compile time. Hence, after a variable is declared, assigning a value of a value of a different type (unless it's implicitly convertible to the target type) to the variable is prohibited. There are several ways to convert types in Rust.
+C is statically-typed at compile time. Hence, after a variable is declared, assigning a value of a value of a different type (unless it's implicitly convertible to the target type) to the variable is prohibited. There are several ways to convert types in C.
 
 ## Implicit conversions
 
-Implicit conversions exist in JavaScript as well as in Rust (called [type coercions]).
+Implicit conversions exist in JavaScript as well as in C (called [type coercions]).
 Consider the following example:
 
 ```js
@@ -12,31 +12,33 @@ let intNumber = 1;
 let longNumber = intNumber;
 ```
 
-Rust is much more restrictive with respect to which type coercions are allowed:
+In C:
 
-```rust
-let int_number: i32 = 1;
-let long_number: i64 = int_number; // error: expected `i64`, found `i32`
+```c
+#include <stdio.h>
+
+int main() {
+    int int_number = 1;
+    long long_number = int_number; // No error in C
+    printf("int_number: %d, long_number: %ld\n", int_number, long_number);
+    return 0;
+}
 ```
 
-An example for a valid implicit conversion using [subtyping][subtyping.rs] is:
+By assigning the address of s to t, it is possible to achieve a similar implicit conversion in C:
 
 ```rust
-fn bar<'a>() {
-    let s: &'static str = "hi";
-    let t: &'a str = s;
+void bar() {
+    const char *s = "hi";
+    const char *t = s;
 }
 ```
 
 See also:
 
 - [Deref coercion]
-- [Subtyping and variance]
 
-[type coercions]: https://doc.rust-lang.org/reference/type-coercions.html
-[subtyping.rs]: https://github.com/rust-lang/rfcs/blob/master/text/0401-coercions.md#subtyping
-[deref coercion]: https://doc.rust-lang.org/std/ops/trait.Deref.html#more-on-deref-coercion
-[Subtyping and variance]: https://doc.rust-lang.org/reference/subtyping.html#subtyping-and-variance
+[type coercions]: https://www.geeksforgeeks.org/type-conversion-c/
 
 ## Explicit conversions
 
@@ -48,46 +50,48 @@ let a = 1.2;
 let b = parseInt(a);
 ```
 
-Explicit conversions can potentially fail at run-time with exceptions when _down-casting_.
+C does not handle exceptions during conversions:
 
-Rust does not provide coercion between primitive types, but instead uses [explicit conversion][casting.rs] using the [`as`][as.rs] keyword (casting). Casting in Rust will not cause a panic.
+```c
+#include <stdio.h>
 
-```rust
-let int_number: i32 = 1;
-let long_number: i64 = int_number as _;
+int main() {
+    int int_number = 1;
+    long long_number = (long)int_number;
+    
+    // Additional code for demonstration
+    printf("Integer: %d\n", int_number);
+    printf("Long: %ld\n", long_number);
+    
+    return 0;
+}
 ```
-
-[casting.rs]: https://doc.rust-lang.org/rust-by-example/types/cast.html
-[as.rs]: https://doc.rust-lang.org/reference/expressions/operator-expr.html#type-cast-expressions
 
 ## Custom conversion
 
-<!--Commonly, .NET types provide user-defined conversion operators to convert one
-type to another type. Also, `System.IConvertible` serves the purpose of
-converting one type into another.-->
+In C, type conversion is typically achieved through explicit casting:
 
-In Rust, the standard library contains an abstraction for converting a value into a different type, in form of the [`From`][from.rs] trait and its reciprocal, [`Into`][into.rs]. When implementing `From` for a type, a default implementation for `Into` is automatically provided (called _blanket implementation_ in Rust). The following example illustrates two of such type conversions:
+```c
+#include <stdio.h>
+#include <string.h>
 
-```rust
-fn main() {
-    let my_id = MyId("id".into()); // `into()` is implemented automatically due to the `From<&str>` trait implementation for `String`.
-    println!("{}", String::from(my_id)); // This uses the `From<MyId>` implementation for `String`.
+typedef struct {
+    char value[100];
+} MyId;
+
+void fromMyIdToString(MyId myId, char* result) {
+    strcpy(result, myId.value);
 }
 
-struct MyId(String);
+int main() {
+    MyId myId;
+    strcpy(myId.value, "id");
 
-impl From<MyId> for String {
-    fn from(MyId(value): MyId) -> Self {
-        value
-    }
+    char result[100];
+    fromMyIdToString(myId, result);
+
+    printf("%s\n", result);
+
+    return 0;
 }
 ```
-
-See also:
-
-- [`TryFrom`][try-from.rs] and [`TryInto`][try-into.rs] for versions of `From` and `Into` which can fail.
-
-[from.rs]: https://doc.rust-lang.org/std/convert/trait.From.html
-[into.rs]: https://doc.rust-lang.org/std/convert/trait.Into.html
-[try-from.rs]: https://doc.rust-lang.org/std/convert/trait.TryFrom.html
-[try-into.rs]: https://doc.rust-lang.org/std/convert/trait.TryInto.html
