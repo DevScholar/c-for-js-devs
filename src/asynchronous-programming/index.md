@@ -1,6 +1,6 @@
 # Asynchronous Programming
 
-Both JavaScript and Rust support asynchronous programming models, which look similar to each other with respect to their usage. The following example shows, on a very high level, how async code looks like in JavaScript:
+Both JavaScript and C support asynchronous programming models, which look similar to each other with respect to their usage. The following example shows, on a very high level, how async code looks like in JavaScript:
 
 ```js
 async function printDelayed(message, cancellationToken) {
@@ -9,34 +9,45 @@ async function printDelayed(message, cancellationToken) {
 }
 ```
 
-Rust code is structured similarly. The following sample relies on [async-std] for the implementation of `sleep`:
+C code is structured differently:
 
-```rust
-use std::time::Duration;
-use async_std::task::sleep;
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
+#include <unistd.h>
 
-async fn format_delayed(message: &str) -> String {
-    sleep(Duration::from_secs(1)).await;
-    format!("Message: {}", message)
+void* printDelayed(void* args) {
+    char* message = (char*)args;
+    sleep(1); // Simulating a delay of 1 second
+    char* result = malloc(strlen(message) + 10); // Allocating memory for the result
+    sprintf(result, "Message: %s", message);
+    return result;
+}
+
+int main() {
+    char* message = "Hello, World!";
+    pthread_t tid;
+    void* result;
+
+    pthread_create(&tid, NULL, printDelayed, (void*)message);
+    pthread_join(tid, &result);
+
+    printf("%s\n", (char*)result);
+    free(result); // Freeing allocated memory
+    return 0;
 }
 ```
 
-1. The Rust [`async`][async.rs] keyword transforms a block of code into a state machine that implements a trait called [`Future`][future.rs]. In both languages, this allows for writing asynchronous code sequentially.
-
-2. Note that for both Rust and JavaScript, asynchronous methods/functions are prefixed with the async keyword, but the return types are different. Asynchronous methods in JavaScript indicate the full and actual return type because it can vary. In Rust, it is enough to specify the _inner type_ `String` because it's _always some future_; that is, a type that implements the `Future` trait.
-
-3. The `await` keywords are in different positions in JavaScript and Rust. In C#, `Promise` is awaited by prefixing the expression with `await`. In Rust,
-   suffixing the expression with the `.await` keyword allows for _method
-   chaining_, even though `await` is not a method.
-
+```bash
+gcc -o output main.c -pthread
+```
 See also:
 
-- [Asynchronous programming in Rust]
-
-[async-std]: https://docs.rs/async-std/latest/async_std/
-[async.rs]: https://doc.rust-lang.org/std/keyword.async.html
-[future.rs]: https://doc.rust-lang.org/std/future/trait.Future.html
-[Asynchronous programming in Rust]: https://rust-lang.github.io/async-book/
+- [Asynchronous programming in C]
+- 
+[Asynchronous programming in C]: https://hackaday.com/2019/09/24/asynchronous-routines-for-c/
 
 ## Executing tasks
 
@@ -53,49 +64,42 @@ async function printDelayed(message, cancellationToken) {
 }
 ```
 
-In Rust, the same function invocation does not print anything.
+In C:
 
-```rust
-use async_std::task::sleep;
-use std::time::Duration;
+```c
+#include <stdio.h>
 
-#[tokio::main] // used to support an asynchronous main method
-async fn main() {
-    print_delayed("message"); // Prints nothing.
-    sleep(Duration::from_secs(2)).await;
+#ifdef _WIN32
+#include <windows.h>
+#define sleep(x) Sleep(x * 1000)
+#else
+#include <unistd.h>
+#endif
+
+void printDelayed(char* message) {
+    sleep(1); // Delay for 1 second
+    printf("%s\n", message);
 }
 
-async fn print_delayed(message: &str) {
-    sleep(Duration::from_secs(1)).await;
-    println!("{}", message);
+int main() {
+    char* message = "message";
+    printDelayed(message); // Prints "message" after a second.
+    sleep(2); // Delay for 2 seconds
+    return 0;
 }
 ```
-
-This is because futures are lazy: they do nothing until they are run. The most common way to run a `Future` is to `.await` it. When `.await` is called on a `Future`, it will attempt to run it to completion. If the `Future` is blocked, it will yield control of the current thread. When more progress can be made, the `Future` will be picked up by the executor and will resume running, allowing the `.await` to resolve (see [`async/.await`][async-await.rs]).
-
-While awaiting a function works from within other `async` functions, `main` [is not allowed to be `async`][error-E0752]. This is a consequence of the fact that Rust itself does not provide a runtime for executing asynchronous code. Hence, there are libraries for executing asynchronous code, called [async runtimes]. [Tokio][tokio.rs] is such an async runtime, and it is frequently used. [`tokio::main`][tokio-main.rs] from the above example marks the `async main` function as entry point to be executed by a runtime, which is set up automatically when using the macro.
-
-[tokio.rs]: https://crates.io/crates/tokio
-[tokio-main.rs]: https://docs.rs/tokio/latest/tokio/attr.main.html
-[async-await.rs]: https://rust-lang.github.io/async-book/03_async_await/01_chapter.html#asyncawait
-[error-E0752]: https://doc.rust-lang.org/error-index.html#E0752
-[async runtimes]: https://rust-lang.github.io/async-book/08_ecosystem/00_chapter.html#async-runtimes
 
 ## Task cancellation
 
 The previous JavaScript examples included passing a `CancellationToken` to asynchronous methods, as is considered best practice in JavaScript. `CancellationToken`s can be used to abort an asynchronous operation.
 
-Because futures are inert in Rust (they make progress only when polled), cancellation works differently in Rust. When dropping a `Future`, the `Future` will make no further progress. It will also drop all instantiated values up to the point where the future is suspended due to some outstanding asynchronous operation. This is why most asynchronous functions in Rust don't take an argument to signal cancellation, and is why dropping a future is sometimes being referred to as _cancellation_.
-
-[`tokio_util::sync::CancellationToken`][cancellation-token.rs] offers an equivalent to the .NET `CancellationToken` to signal and react to cancellation, for cases where implementing the `Drop` trait on a `Future` is unfeasible.
-
-[cancellation-token.rs]: https://docs.rs/tokio-util/latest/tokio_util/sync/struct.CancellationToken.html
+In C language, the concept ofcancellation  can be implemented using custom structures and functions.
 
 ## Executing multiple Tasks
 
-In JavaScript, `Promise.race` and `Task.WhenAll` are frequently used to handle the execution of multiple tasks.
+In JavaScript, `Promise.race` is frequently used to handle the execution of multiple tasks.
 
-`Promise.race` completes as soon as any task completes. Tokio, for example, provides the [`tokio::select!`][tokio-select] macro as an alternative for `Promise.race`, which means to wait on multiple concurrent branches.
+`Promise.race` completes as soon as any task completes. 
 
 ```js
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -113,76 +117,85 @@ Promise.race([delay1, delay2]).then(result => {
 });
 ```
 
-The same example for Rust:
+In C, to achieve similar functionality to Promise.race in JavaScript, one can use a combination of threads and synchronization mechanisms like mutexes or semaphores. By creating multiple threads that perform tasks concurrently and using synchronization to determine which thread finishes first, a similar behavior to Promise.race can be achieved in C. Below is a simplified example in C:
 
-```rust
-use std::time::Duration;
-use tokio::{select, time::sleep};
+```c
+#include <stdio.h>
+#include <pthread.h>
+#include <unistd.h>
 
-#[tokio::main]
-async fn main() {
-    let result = select! {
-        result = delay(Duration::from_secs(2)) => result,
-        result = delay(Duration::from_secs(1)) => result,
-    };
-
-    println!("{}", result); // Waited 1 second(s).
+void* delayMessage(void* delayTime) {
+    int ms = *((int*)delayTime);
+    usleep(ms * 1000); // Convert milliseconds to microseconds
+    char* message = malloc(100 * sizeof(char));
+    sprintf(message, "Waited %d second(s).", ms / 1000);
+    return message;
 }
 
-async fn delay(delay: Duration) -> String {
-    sleep(delay).await;
-    format!("Waited {} second(s).", delay.as_secs())
+int main() {
+    pthread_t thread1, thread2;
+    int delay1 = 1000;
+    int delay2 = 2000;
+    char* result1;
+    char* result2;
+
+    pthread_create(&thread1, NULL, delayMessage, (void*)&delay1);
+    pthread_create(&thread2, NULL, delayMessage, (void*)&delay2);
+
+    pthread_join(thread1, (void**)&result1);
+    pthread_join(thread2, (void**)&result2);
+
+    printf("%s\n", result1); // Output: Waited 1 second(s).
+
+    free(result1);
+    free(result2);
+
+    return 0;
 }
 ```
 
-Again, there are crucial differences in semantics between the two examples. Most importantly, `tokio::select!` will cancel all remaining branches, while `Promise.race` leaves it up to the user to cancel any in-flight tasks.
-
-Similarly, `Promise.all` can be replaced with [`tokio::join!`][tokio-join].
-
-[tokio-select]: https://docs.rs/tokio/latest/tokio/macro.select.html
-[tokio-join]: https://docs.rs/tokio/latest/tokio/macro.join.html
-
 ## Multiple consumers
 
-In JavaScript a `Promise` can be used across multiple consumers. All of them can await the task and get notified when the task is completed or failed. In Rust, the `Future` can not be cloned or copied, and `await`ing will move the ownership. The `futures::FutureExt::shared` extension creates a cloneable handle to a `Future`, which then can be distributed across multiple consumers.
+In JavaScript a `Promise` can be used across multiple consumers. All of them can await the task and get notified when the task is completed or failed. 
 
-```rust
-use futures::FutureExt;
-use std::time::Duration;
-use tokio::{select, time::sleep, signal};
-use tokio_util::sync::CancellationToken;
+In C:
 
-#[tokio::main]
-async fn main() {
-    let token = CancellationToken::new();
-    let child_token = token.child_token();
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
 
-    let bg_operation = background_operation(child_token);
-
-    let bg_operation_done = bg_operation.shared();
-    let bg_operation_final = bg_operation_done.clone();
-
-    select! {
-        _ = bg_operation_done => {},
-        _ = signal::ctrl_c() => {
-            token.cancel();
-        },
-    }
-
-    bg_operation_final.await;
+void background_operation() {
+    sleep(2);
+    printf("Background operation completed.\n");
 }
 
-async fn background_operation(cancellation_token: CancellationToken) {
-    select! {
-        _ = sleep(Duration::from_secs(2)) => println!("Background operation completed."),
-        _ = cancellation_token.cancelled() => println!("Background operation cancelled."),
+void signal_handler(int signal) {
+    if (signal == SIGINT) {
+        printf("Signal received. Cancelling background operation.\n");
+        exit(0);
     }
+}
+
+int main() {
+    signal(SIGINT, signal_handler);
+
+    pid_t pid = fork();
+    if (pid == 0) {
+        background_operation();
+    }
+
+    wait(NULL);
+    printf("Parent process waiting for child process to finish.\n");
+
+    return 0;
 }
 ```
 
 ## Asynchronous iteration
 
-Rust does not yet have an API for asynchronous iteration in the standard library. To support asynchronous iteration, the [`Stream`][stream.rs] trait from [`futures`][futures-stream.rs] offers a comparable set of functionality.
+C does not yet have an API for asynchronous iteration in the standard library.
 
 In JavaScript, writing async iterators has comparable syntax to when writing synchronous iterators:
 
@@ -201,38 +214,28 @@ async function* RangeAsync(start, count) {
 })();
 ```
 
-In Rust, there are several types that implement the `Stream` trait, and hence can be used for creating streams, e.g. `futures::channel::mpsc`. [`async-stream`][tokio-async-stream] offers a set of macros that can be used to generate streams succinctly.
+In C:
 
-```rust
-use async_stream::stream;
-use futures_core::stream::Stream;
-use futures_util::{pin_mut, stream::StreamExt};
-use std::{
-    io::{stdout, Write},
-    time::Duration,
-};
-use tokio::time::sleep;
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-#[tokio::main]
-async fn main() {
-    let stream = range(10, 3);
-    pin_mut!(stream); // needed for iteration
-    while let Some(result) = stream.next().await {
-        print!("{} ", result); // Prints "10 11 12".
-        stdout().flush().unwrap();
+typedef struct {
+    int start;
+    int count;
+} Range;
+
+void RangeAsync(Range range) {
+    for (int i = 0; i < range.count; i++) {
+        usleep(i * 1000000); // Simulating async delay in microseconds
+        printf("%d ", range.start + i);
     }
 }
 
-fn range(start: i32, count: i32) -> impl Stream<Item = i32> {
-    stream! {
-        for i in 0..count {
-            sleep(Duration::from_secs(i as _)).await;
-            yield start + i;
-        }
-    }
+int main() {
+    Range range = {10, 3};
+    RangeAsync(range);
+    return 0;
 }
 ```
-
-[stream.rs]: https://rust-lang.github.io/async-book/05_streams/01_chapter.html
-[futures-stream.rs]: https://docs.rs/futures/latest/futures/stream/trait.Stream.html
-[tokio-async-stream]: https://github.com/tokio-rs/async-stream

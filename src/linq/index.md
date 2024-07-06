@@ -4,7 +4,7 @@ This section discusses LINQ within the context and for the purpose of querying o
 
 ## Enumerable items
 
-The equivalent of enumerable items in Rust is [`IntoIterator`][into-iter.rs]. An implementation of `IntoIterator::into_iter` returns an [`Iterator`][iter.rs]. However, when it's time to iterate over the items of a container advertising iteration support through the said types, both languages offer syntactic sugar in the form of looping constructs for iteratables. In JavaScript, there is `forEach`: 
+The equivalent of enumerable items in C is `enum`. In JavaScript, there is `forEach`: 
 
 ```js
 let values = [1, 2, 3, 4, 5];
@@ -19,47 +19,51 @@ values.forEach((value, index) => {
 console.log(output); // Outputs: 1, 2, 3, 4, 5
 ```
 
-In Rust, the equivalent is simply `for`:
+In C, the equivalent is simply `for`:
 
-```rust
-use std::fmt::Write;
+```c
+u#include <stdio.h>
+#include <string.h> // Include the string.h header file
 
-fn main() {
-    let values = [1, 2, 3, 4, 5];
-    let mut output = String::new();
-
-    for value in values {
-        if output.len() > 0 {
-            output.push_str(", ");
-        }
-        // ! discard/ignore any write error
-        _ = write!(output, "{value}");
+int main() {
+    int values[] = {1, 2, 3, 4, 5};
+    char output[50] = "";
+    
+    for (int i = 0; i < 5; i++) {
+        if (i > 0)
+            sprintf(output + strlen(output), ", ");
+        sprintf(output + strlen(output), "%d", values[i]);
     }
 
-    println!("{output}");  // Prints: 1, 2, 3, 4, 5
+    printf("%s\n", output); // Outputs: 1, 2, 3, 4, 5
+
+    return 0;
 }
 ```
 
 The `for` loop over an iterable essentially gets desuraged to the following:
 
-```rust
-use std::fmt::Write;
+```c
+#include <stdio.h>
+#include <string.h>
+int main() {
+    int values[] = {1, 2, 3, 4, 5};
+    char output[50] = "";
+    int i;
 
-fn main() {
-    let values = [1, 2, 3, 4, 5];
-    let mut output = String::new();
-
-    let mut iter = values.into_iter();      // get iterator
-    while let Some(value) = iter.next() {   // loop as long as there are more items
-        if output.len() > 0 {
-            output.push_str(", ");
+    for (i = 0; i < sizeof(values) / sizeof(values[0]); i++) {
+        if (i > 0) {
+            sprintf(output + strlen(output), ", ");
         }
-        _ = write!(output, "{value}");
+        sprintf(output + strlen(output), "%d", values[i]);
     }
 
-    println!("{output}");
+    printf("%s\n", output);
+    return 0;
 }
 ```
+
+<!--
 
 Rust's ownership and data race condition rules apply to all instances and data, and iteration is no exception. So while looping over an array might look straightforward, one has to be mindful about ownership when needing to iterate the same collection/iterable more than once. The following example iteraters the list of integers twice, once to print their sum and another time to determine and print the maximum integer: 
 
@@ -197,91 +201,16 @@ See also:
 [iter.rs]: https://doc.rust-lang.org/core/iter/trait.Iterator.html
 [iter-mod]: https://doc.rust-lang.org/std/iter/index.html
 [iterating by reference]: https://doc.rust-lang.org/std/iter/index.html#iterating-by-reference
-
+-->
 ## Operators
 
-JavaScript doesn't natively support LINQ, but there is a project called [LINQ.js](https://github.com/mihaifm/linq) that implements LINQ in C# for JavaScript.
+JavaScript and C don't natively support LINQ, but there is a project called [LINQ.js](https://github.com/mihaifm/linq) that implements LINQ in C# for JavaScript, and a project called [linq4c](https://github.com/haifenghuang/linq4c) that implements LINQ in C# for C.
 
 _Operators_ in LINQ are implemented in the form of LINQ.js extension methods that can be chained together to form a set of operations, with the most common forming a query over some sort of data source. LINQ.js also offers a SQL-inspired _query syntax_ with clauses like `from`, `where`, `select`, `join` and others that can serve as an alternative or a companion to method chaining. Many imperative loops can be re-written as much more expressive and composable queries in LINQ.
 
-Rust does not offer anything like LINQ.js's query syntax. It has methods, called _[adapters]_ in Rust terms, over iterable types and therefore directly comparable to chaining of methods in LINQ.js. However, whlie rewriting an imperative loop as LINQ code in LINQ.js is often beneficial in expressivity, robustness and composability, there is a trade-off with performance. Compute-bound imperative loops _usually_ run faster because they can be optimised by the JIT compiler and there are fewer virtual dispatches or indirect function invocations incurred. The surprising part in Rust is that there is no performance trade-off between choosing to use method chains on an abstraction like an iterator over writing an imperative loop by hand. It's therefore far more common to see the former in code.
-
-The following table lists the most common LINQ methods and their approximate counterparts in Rust.
-
-| LINQ.js           | Rust         | Note        |
-| ----------------- | ------------ | ----------- |
-| `aggregate`       | `reduce`     | See note 1. |
-| `aggregate`       | `fold`       | See note 1. |
-| `all`             | `all`        |             |
-| `any`             | `any`        |             |
-| `concat`          | `chain`      |             |
-| `count`           | `count`      |             |
-| `elementAt`       | `nth`        |             |
-| `groupBy`         | -            |             |
-| `last`            | `last`       |             |
-| `max`             | `max`        |             |
-| `max`             | `max_by`     |             |
-| `maxBy`           | `max_by_key` |             |
-| `min`             | `min`        |             |
-| `min`             | `min_by`     |             |
-| `minBy`           | `min_by_key` |             |
-| `reverse`         | `rev`        |             |
-| `select`          | `map`        |             |
-| `select`          | `enumerate`  |             |
-| `selectMany`      | `flat_map`   |             |
-| `selectMany`      | `flatten`    |             |
-| `sequenceEqual`   | `eq`         |             |
-| `single`          | `find`       |             |
-| `singleOrDefault` | `try_find`   |             |
-| `skip`            | `skip`       |             |
-| `skipWhile`       | `skip_while` |             |
-| `sum`             | `sum`        |             |
-| `take`            | `take`       |             |
-| `takeWhile`       | `take_while` |             |
-| `toArray`         | `collect`    | See note 2. |
-| `toDictionary`    | `collect`    | See note 2. |
-| `toList`          | `collect`    | See note 2. |
-| `where`           | `filter`     |             |
-| `zip`             | `zip`        |             |
-
-1. The `Aggregate` overload not accepting a seed value is equivalent to `reduce`, while the `Aggregate` overload accepting a seed value corresponds to `fold`.
-
-2. [`collect`][collect.rs] in Rust generally works for any collectible type,    which is defined as [a type that can initialize itself from an iterator    (see `FromIterator`)][FromIter.rs]. `collect` needs a target type, which    the compiler sometimes has trouble inferring so the _turbofish_ (`::<>`) is    often used in conjunction with it, as in `collect::<Vec<_>>()`. This is why    `collect` appears next to a number of LINQ extension methods that convert    an enumerable/iterable source to some collection type instance.
-
-  [FromIter.rs]: https://doc.rust-lang.org/stable/std/iter/trait.FromIterator.html
-
-The following example shows how similar transforming sequences in LINQ.js is to doing the same in Rust. First in LINQ.js:
-
-```js
-let result = Enumerable.range(0, 10)
-    .where(x => x % 2 === 0)
-    .selectMany(x => Enumerable.Range(0, x))
-    .aggregate(0, (acc, x) => acc + x);
-
-console.log(result); // Output: 50
-```
-
-And in Rust:
-
-```rust
-let result = (0..10)
-    .filter(|x| x % 2 == 0)
-    .flat_map(|x| (0..x))
-    .fold(0, |acc, x| acc + x);
-
-println!("{result}"); // 50
-```
-
-[adapters]: https://doc.rust-lang.org/std/iter/index.html#adapters
-[collect.rs]: https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.collect
-
 ## Deferred execution (laziness)
 
-Many operators in LINQ are designed to be lazy such that they only do work when absolutely required. This enables composition or chaining of several operations/methods without causing any side-effects. <!--For example, a LINQ operator can return an `IEnumerable<T>` that is initialized, but does not produce, compute or materialize any items of `T` until iterated. The operator is said to have _deferred execution_ semantics. If each `T` is computed as iteration reaches it (as opposed to when iteration begins) then the operator is said to _stream_ the results.-->
-
-Rust iterators have the same concept of [_laziness_][iter-laziness] and streaming.
-
-  [iter-laziness]: https://doc.rust-lang.org/std/iter/index.html#laziness
+Many operators in LINQ are designed to be lazy such that they only do work when absolutely required. This enables composition or chaining of several operations/methods without causing any side-effects.
 
 In both cases, this allows _infinite sequences_ to be represented, where the underlying sequence is infinite, but the developer decides how the sequence should be terminated. The following example shows this in JavaScript:
 
@@ -301,20 +230,20 @@ for (let x of infiniteRange()) {
 }
 ```
 
-Rust supports the same concept through infinite ranges:
+C supports the same concept through `for`:
 
-```rust
-// Generators and yield in Rust are unstable at the moment, so
-// instead, this sample uses Range:
-// https://doc.rust-lang.org/std/ops/struct.Range.html
+```c
+#include <stdio.h>
 
-for value in (0..).take(5) {
-    print!("{value} "); // Prints "0 1 2 3 4"
+int main() {
+    int value;
+    for (value = 0; value < 5; value++) {
+        printf("%d ", value); // Prints "0 1 2 3 4"
+    }
+    return 0;
 }
 ```
 
 ## Iterator Methods (`yield`)
 
-JavaScript has the `yield` keword that enables the developer to quickly write an _iterator method_. <!--The return type of an iterator method can be an `IEnumerable<T>` or an `IEnumerator<T>`. The compiler then converts the body of the method into a concrete implementation of the return type, instead of the developer having to write a full-blown class each time.--> _[Coroutines][coroutines.rs]_, as they're called in Rust, are still considered an unstable feature at the time of this writing.
-
-  [coroutines.rs]: https://doc.rust-lang.org/unstable-book/language-features/coroutines.html
+JavaScript has the `yield` keword that enables the developer to quickly write an _iterator method_. C doesn't support coroutines natively, but there is a [tutorial of implementing coroutines in C](https://www.chiark.greenend.org.uk/~sgtatham/coroutines.html).

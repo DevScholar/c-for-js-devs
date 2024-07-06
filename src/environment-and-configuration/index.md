@@ -29,105 +29,49 @@ if (!value) {
 }
 ```
 
-Rust is providing the same functionality of accessing an environment variable at runtime via the `var` and `var_os` functions from the `std::env` module.
+In C programming, environmental variables can be accessed using the getenv() function provided by the standard library <stdlib.h>. This function allows a program to retrieve the value of a specific environmental variable by providing its name as an argument.
 
-`var` function is returning a `Result<String, VarError>`, either returning the variable if set or returning an error if the variable is not set or it is not valid Unicode.
+Here is a simple example demonstrating how to retrieve the value of an environmental variable named PATH:
 
-`var_os` has a different signature giving back an `Option<OsString>`, either returning some value if the variable is set, or returning None if the variable is not set. An `OsString` is not required to be valid Unicode.
+```c
+#include <stdio.h>
+#include <stdlib.h>
 
-```rust
-use std::env;
+int main() {
+    char *path_value = getenv("PATH");
 
-
-fn main() {
-    let key = "ExampleVariable";
-    match env::var(key) {
-        Ok(val) => println!("{key}: {val:?}"),
-        Err(e) => println!("couldn't interpret {key}: {e}"),
+    if (path_value != NULL) {
+        printf("The value of PATH is: %s\n", path_value);
+    } else {
+        printf("PATH is not set.\n");
     }
+
+    return 0;
 }
 ```
 
-```rust
-use std::env;
+In C, accessing environment variables at compile time involves utilizing preprocessor directives and macros to incorporate the values of environment variables during the compilation phase. This process allows for the configuration of the program based on the environment where it will run without the need for runtime modifications.
 
-fn main() {
-    let key = "ExampleVariable";
-    match env::var_os(key) {
-        Some(val) => println!("{key}: {val:?}"),
-        None => println!("{key} not defined in the enviroment"),
-    }
+One common approach to achieve this functionality is by using the -D flag in the compiler command to define a macro with the value of the desired environment variable. For instance, consider an environment variable MY_ENV_VAR that you want to access at compile time. You can pass this variable's value to the compiler using the -D flag as follows:
+
+```c
+#include <stdio.h>
+
+#ifndef MY_ENV_VAR
+    #define MY_ENV_VAR "default_value"
+#endif
+
+int main() {
+    printf("Value of MY_ENV_VAR: %s\n", MY_ENV_VAR);
+    return 0;
 }
 ```
+When compiling the program, it is possible to set the value of MY_ENV_VAR by defining it during compilation:
 
-Rust is also providing the functionality of accessing an environment variable at compile time. The `env!` macro from `std::env` expands the value of the variable at compile time, returning a `&'static str`. If the variable is not set, an error is emitted.
-
-```rust
-use std::env;
-
-fn main() {
-    let example = env!("ExampleVariable");
-    println!("{example}");
-}
+```bash
+gcc -o myprogram myprogram.c -DMY_ENV_VAR='"custom_value"'
 ```
 
 ## Configuration
 
-JavaScript doesn't support configurations.
-<!--Configuration in .NET is possible with configuration providers. The framework is
-providing several provider implementations via
-`Microsoft.Extensions.Configuration` namespace and NuGet packages.
-
-Configuration providers read configuration data from key-value pairs using
-different sources and provide a unified view of the configuration via the
-`IConfiguration` type.
-
-```csharp
-using Microsoft.Extensions.Configuration;
-
-class Example {
-    static void Main()
-    {
-        IConfiguration configuration = new ConfigurationBuilder()
-            .AddEnvironmentVariables()
-            .Build();
-
-        var example = configuration.GetValue<string>("ExampleVar");
-
-        Console.WriteLine(example);
-    }
-}
-```
-
-Other providers examples can be found in the official documentation
-[Configurations provider in .NET][conf-net].
-
-A similar configuration experience in Rust is available via use of third-party
-crates such as [figment] or [config].
--->
-In Rust it is available via use of third-party crates such as [figment] or [config]. See the following example making use of [config] crate:
-
-```rust
-use config::{Config, Environment};
-
-fn main() {
-    let builder = Config::builder().add_source(Environment::default());
-
-    match builder.build() {
-        Ok(config) => {
-            match config.get_string("examplevar") {
-                Ok(v) => println!("{v}"),
-                Err(e) => println!("{e}")
-            }
-        },
-        Err(_) => {
-            // something went wrong
-        }
-    }
-}
-
-```
-
-[conf-net]: https://learn.microsoft.com/en-us/dotnet/core/extensions/configuration-providers
-[figment]: https://crates.io/crates/figment
-[config]: https://crates.io/crates/config
+JavaScript doesn't support configurations, neither nor C.
