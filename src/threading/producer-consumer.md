@@ -26,33 +26,30 @@ worker.onmessage = function(event) {
 worker.postMessage(null);
 
 ```
-The same can be done in Rust using _channels_. The standard library primarily provides `mpsc::channel`, which is a channel that supports multiple producers and a single consumer. A rough translation of the above C# example in Rust would look as follows:
 
-The same can be done in Rust using _channels_. The standard library primarily provides `mpsc::channel`, which is a channel that supports multiple producers and a single consumer. A rough translation of the above C# example in Rust would look as follows:
+A rough translation of the above JavaScript example in C would look as follows:
 
-```rust
-use std::thread;
-use std::sync::mpsc;
-use std::time::Duration;
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
 
-fn main() {
-    let (tx, rx) = mpsc::channel();
+#define BUFFER_SIZE 10
 
-    let producer = thread::spawn(move || {
-        for n in 1..10 {
-            tx.send(format!("Message #{}", n)).unwrap();
-        }
-    });
-
-    // main thread is the consumer here
-    for received in rx {
-        println!("{}", received);
+void* producer(void* arg) {
+    for (int n = 1; n < 10; n++) {
+        printf("Message #%d\n", n);
     }
+    pthread_exit(NULL);
+}
 
-    producer.join().unwrap();
+int main() {
+    pthread_t tid;
+    pthread_create(&tid, NULL, producer, NULL);
+
+    // main thread acts as the consumer
+    pthread_join(tid, NULL);
+
+    return 0;
 }
 ```
-
-The equivalent of the [async-friendly channels in the Rust space is offered by the Tokio runtime][tokio-channels].
-
-  [tokio-channels]: https://tokio.rs/tokio/tutorial/channels

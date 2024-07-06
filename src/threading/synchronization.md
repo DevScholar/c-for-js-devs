@@ -32,48 +32,40 @@ for (let i = 0; i < 10; i++) {
 }
 
 ```
+Using threading and synchronization mechanisms available in C:
 
-In Rust, one must make explicit use of concurrency structures like `Mutex`:
+```c
+#include <stdio.h>
+#include <pthread.h>
 
-```rust
-use std::thread;
-use std::sync::{Arc, Mutex};
+#define NUM_THREADS 10
+#define NUM_INCREMENTS 1000
 
-fn main() {
-    let data = Arc::new(Mutex::new(0)); // (1)
+int data = 0;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-    let mut threads = vec![];
-    for _ in 0..10 {
-        let data = Arc::clone(&data); // (2)
-        let thread = thread::spawn(move || { // (3)
-            for _ in 0..1000 {
-                let mut data = data.lock().unwrap();
-                *data += 1; // (4)
-            }
-        });
-        threads.push(thread);
+void* thread_function(void* arg) {
+    for (int i = 0; i < NUM_INCREMENTS; i++) {
+        pthread_mutex_lock(&mutex);
+        data++;
+        pthread_mutex_unlock(&mutex);
+    }
+    pthread_exit(NULL);
+}
+
+int main() {
+    pthread_t threads[NUM_THREADS];
+
+    for (int i = 0; i < NUM_THREADS; i++) {
+        pthread_create(&threads[i], NULL, thread_function, NULL);
     }
 
-    for thread in threads {
-        thread.join().unwrap();
+    for (int i = 0; i < NUM_THREADS; i++) {
+        pthread_join(threads[i], NULL);
     }
 
-    println!("{}", data.lock().unwrap());
+    printf("%d\n", data);
+
+    return 0;
 }
 ```
-
-A few things to note:
-
-- Since the ownership of the `Mutex` instance and in turn the data it guards will be shared by multiple threads, it is wrapped in an `Arc` (1). `Arc` provides atomic reference counting, which increments each time it is cloned (2) and decrements each time it is dropped. When the count reaches zero, the mutex and in turn the data it guards are dropped. This is discussed in more detail in [Memory Management]).  
-- The closure instance for each thread receives ownership (3) of the _cloned reference_ (2).  - 
-- The pointer-like code that is `*data += 1` (4), is not some unsafe pointer access even if it looks like it. It's updating the data _wrapped_ in the [mutex guard].
-
-Unlike the C# version, where one can render it thread-unsafe by commenting out the `lock` statement, the Rust version will refuse to compile if it's changed in any way (e.g. by commenting out parts) that renders it thread-unsafe. This demonstrates that writing thread-safe code is the developer's responsibility in C# and .NET by careful use of synchronized structures whereas in Rust, one can rely on the compiler.
-The compiler is able to help because data structures in Rust are marked by special _traits_ (see [Interfaces]): `Sync` and `Send`. [`Sync`][sync.rs] indicates that references to a type's instances are safe to share between threads. [`Send`][send.rs] indicates it's safe to instances of a type across thread boundaries. For more information, see the “[Fearless Concurrency]” chapter of the Rust book.
-
-  [Fearless Concurrency]: https://doc.rust-lang.org/book/ch16-00-concurrency.html
-  [Memory Management]: ../memory-management/index.md
-  [mutex guard]: https://doc.rust-lang.org/stable/std/sync/struct.MutexGuard.html
-  [sync.rs]: https://doc.rust-lang.org/stable/std/marker/trait.Sync.html
-  [send.rs]: https://doc.rust-lang.org/stable/std/marker/trait.Send.html
-  [interfaces]: ../language/custom-types/interfaces.md
