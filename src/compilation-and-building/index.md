@@ -31,6 +31,7 @@ There is no concept of dependency in the JavaScript standard. However, some Java
 There is no concept of dependency in the C standard, different IDEs and different toolchains have different ways to manage dependencies.
 
 ## Packages
+
 There is no concept of packages in the JavaScript standard. However, some JavaScript runtimes, such as Node.js, have the concept of packages. NPM is most commonly used to install packages for Node.js, and various tools supported it.
 For example, adding a Node.js package reference with the Node,js CLI will add the
 dependency to the project file:
