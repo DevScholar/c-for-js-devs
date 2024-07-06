@@ -13,10 +13,9 @@ Developers use different ways to prepare a JavaScript executable for distributio
 
 In C, the build output is, again, a platform-dependent, compiled library for each library target.
 
-
 ## Dependencies
 
-There is no concept of dependency in the JavaScript standard. However, some JavaScript runtimes, such as Node.js and Deno, have the concept of dependencies. In Node.js and Deno, the contents of a project file (`package.json`) define the build options and dependencies. In Rust, when using Cargo, a `Cargo.toml` declares the dependencies for a package. A typical project file will look like:
+There is no concept of dependency in the JavaScript standard. However, some JavaScript runtimes, such as Node.js and Deno, have the concept of dependencies. In Node.js and Deno, the contents of a project file (`package.json`) define the build options and dependencies. A typical project file will look like:
 
 ```json
 {
