@@ -7,7 +7,7 @@ There is no concept of CLI in the JavaScript standard. People often use non-brow
 There is no concept of CLI in the C standard, different IDEs and different toolchains have different CLIs.
 ## Building
 
-When building JavaScript, the scripts coming from dependent packages are generally co-located with the project's output assembly. [`cargo build`][cargo-build] in Rust compiles the project sources, except the Rust compiler statically links (although there exist other [linking options][linkage]) all code into a single, platform-dependent, binary.
+When building JavaScript, the scripts coming from dependent packages are generally co-located with the project's output assembly. C compilers compiles the project sources, except the C compiler statically links all code into a single, platform-dependent, binary.
 
 Developers use different ways to prepare a JavaScript executable for distribution, either as a _framework-dependent deployment_ (FDD) or _self-contained deployment_ (SCD). In Rust, there is no way to let the build output already contains a single, platform-dependent binary for each target.
 
