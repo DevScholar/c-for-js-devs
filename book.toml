@@ -2,7 +2,7 @@
 language = "en"
 multilingual = false
 src = "src"
-title = "Rust for JavaScript Developers"
+title = "C for JavaScript Developers"
 
 [output.html]
 additional-css = ["ferris.css"]
