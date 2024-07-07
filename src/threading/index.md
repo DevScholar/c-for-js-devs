@@ -4,13 +4,9 @@ The C standard library supports threading, synchronisation and concurrency. Also
 
 For threading in C, the pthread library is commonly used:
 
-To compile the code, use the -pthread flag with gcc:
-`gcc -pthread main.c -o main`
-
-
 ```c
 #include <stdio.h>
-#include <pthread.h>
+#include <pthread.h> // Requires GCC
 
 void *thread_function(void *arg) {
     // Thread logic here
@@ -33,7 +29,7 @@ For synchronization and concurrency in C, mechanisms like mutexes and semaphores
 
 ```c
 #include <stdio.h>
-#include <pthread.h>
+#include <pthread.h> // Requires GCC
 
 pthread_mutex_t mutex;
 
@@ -105,7 +101,7 @@ The same code in C would be as follows:
 
 ```c
 #include <stdio.h>
-#include <pthread.h>
+#include <pthread.h>// Requires GCC
 
 void *thread_function(void *arg) {
     printf("Hello from a thread!\n");
@@ -121,6 +117,7 @@ int main() {
 ```
 
 In JavaScript, it's possible to send data as an argument to a thread:
+
 ```js
 const workerCode = `
 self.onmessage = function(e) {
@@ -137,28 +134,11 @@ const data = "Hello";
 worker.postMessage(data);
 ```
 
-<!--However, a more modern or terser version would use closures:
-
-```csharp
-using System;
-using System.Text;
-using System.Threading;
-
-var data = new StringBuilder("Hello");
-
-var t = new Thread(obj => data.Append(" World!"));
-
-t.Start();
-t.Join();
-
-Console.WriteLine($"Phrase: {data}");
-```-->
-
 In C, the data is passed to the thread:
 
 ```c
 #include <stdio.h>
-#include <pthread.h>
+#include <pthread.h>// Requires GCC
 #include <string.h>
 
 void* thread_function(void* arg) {

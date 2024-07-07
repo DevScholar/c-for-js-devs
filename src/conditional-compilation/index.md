@@ -2,7 +2,7 @@
 
 Both JavaScript and C are providing the possibility for compiling specific code based on external conditions.
 
-JavaScript doesn't support conditional compilation natively. However, it is possible to use some third-party tool like [`babel-plugin-preprocessor`][preproc-dir] in order to control conditional compilation. 
+JavaScript doesn't support conditional compilation natively. However, it is possible to use some third-party tool like `babel-plugin-preprocessor` in order to control conditional compilation. 
 
 ```js
 //#if DEBUG

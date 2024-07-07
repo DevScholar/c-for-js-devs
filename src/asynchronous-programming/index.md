@@ -15,7 +15,7 @@ C code is structured differently:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
+#include <pthread.h> // Requires GCC
 #include <unistd.h>
 
 void* printDelayed(void* args) {
@@ -40,13 +40,10 @@ int main() {
 }
 ```
 
-```bash
-gcc -o output main.c -pthread
-```
 See also:
 
 - [Asynchronous programming in C]
-- 
+
 [Asynchronous programming in C]: https://hackaday.com/2019/09/24/asynchronous-routines-for-c/
 
 ## Executing tasks
@@ -121,7 +118,7 @@ In C, to achieve similar functionality to Promise.race in JavaScript, one can us
 
 ```c
 #include <stdio.h>
-#include <pthread.h>
+#include <pthread.h> // Requires GCC
 #include <unistd.h>
 
 void* delayMessage(void* delayTime) {
@@ -163,28 +160,53 @@ In C:
 ```c
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
+
+#ifdef _WIN32
+#include <windows.h> // For Sleep(), DWORD
+#else
+#include <unistd.h> // For sleep()
+#include <sys/types.h> // For pid_t
+#include <sys/wait.h> // For wait()
+#endif
 
 void background_operation() {
+#ifdef _WIN32
+    Sleep(2000);
+#else
     sleep(2);
+#endif
     printf("Background operation completed.\n");
 }
 
+#ifdef _WIN32
+BOOL WINAPI signal_handler(DWORD dwCtrlType) {
+    if (dwCtrlType == CTRL_C_EVENT) {
+        printf("Signal received. Cancelling background operation.\n");
+        exit(0);
+    }
+    return TRUE;
+}
+#else
 void signal_handler(int signal) {
     if (signal == SIGINT) {
         printf("Signal received. Cancelling background operation.\n");
         exit(0);
     }
 }
+#endif
 
 int main() {
+#ifdef _WIN32
+    SetConsoleCtrlHandler(signal_handler, TRUE);
+#else
     signal(SIGINT, signal_handler);
+#endif
 
-    pid_t pid = fork();
-    if (pid == 0) {
-        background_operation();
-    }
+    DWORD pid = GetCurrentProcessId(); // Get current process ID
+    printf("Process ID: %lu\n", pid);
+
+    // Fork and perform background operation
+    // ...
 
     wait(NULL);
     printf("Parent process waiting for child process to finish.\n");

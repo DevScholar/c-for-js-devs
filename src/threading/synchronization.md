@@ -32,11 +32,12 @@ for (let i = 0; i < 10; i++) {
 }
 
 ```
+
 Using threading and synchronization mechanisms available in C:
 
 ```c
 #include <stdio.h>
-#include <pthread.h>
+#include <pthread.h> // Requires GCC
 
 #define NUM_THREADS 10
 #define NUM_INCREMENTS 1000

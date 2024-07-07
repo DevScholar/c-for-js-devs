@@ -32,7 +32,7 @@ A rough translation of the above JavaScript example in C would look as follows:
 ```c
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
+#include <pthread.h> // Requires GCC
 
 #define BUFFER_SIZE 10
 
