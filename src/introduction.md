@@ -2,7 +2,7 @@
 
 This is a (non-comprehensive) guide for JavaScript developers that are completely new to the C programming language. Some concepts and constructs translate fairly well between JavaScript and C, but which may be expressed differently, whereas others are a radical departure, like memory management. This guide provides a brief comparison and mapping of those constructs and concepts with concise examples.
 
-The original authors[^authors] of this guide were themselves JavaScript developers who were completely new to C. <!--This guide is the compilation of the knowledge acquired by the authors writing Rust code over the course of several months. -->It is the guide the authors wish they had when they started on their Rust journey. That said, the authors would encourage you to read books and other material available on the Web to embrace Rust and its idioms rather than attempting to learn it exclusively through the lens of JavaScript. Meanwhile, this guide can help answers some question quickly, like: _Does C support inheritance, threading, asynchronous programming, etc.?_
+The original authors[^authors] of this guide were themselves JavaScript developers who were completely new to C. <!--This guide is the compilation of the knowledge acquired by the authors writing Rust code over the course of several months. -->It is the guide the authors wish they had when they started on their C journey. That said, the authors would encourage you to read books and other material available on the Web to embrace C and its idioms rather than attempting to learn it exclusively through the lens of JavaScript. Meanwhile, this guide can help answers some question quickly, like: _Does C support inheritance, threading, asynchronous programming, etc.?_
 Assumptions:
 
 - Reader is a seasoned JavaScript developer.
@@ -11,7 +11,7 @@ Assumptions:
 Goals:
 
 - Provide a brief comparison and mapping of various JavaScript topics to their counterparts in C.
-- Provide links to Rust reference, book and articles for further reading on topics.
+- Provide links to C reference, book and articles for further reading on topics.
 
 Non-goals:
 
