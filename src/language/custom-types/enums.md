@@ -1,6 +1,6 @@
 # Enumeration types (`enum`)
 
-To convert a Rust enum to JavaScript, you can represent it using an object with key-value pairs.
+To convert a C enum to JavaScript, you can represent it using an object with key-value pairs.
 
 ```js
 const DayOfWeek = {

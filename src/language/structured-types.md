@@ -1,6 +1,6 @@
 # Structured Types
 
-Commonly used object and collection types in JavaScript and their mapping to Rust.
+Commonly used object and collection types in JavaScript and their mapping to C.
 
 | JavaScript | C                                        |
 | ---------- | ---------------------------------------- |
@@ -120,7 +120,7 @@ int main() {
 
 ## Dictionary
 
-In Rust the equivalent of a `Dictionary` is a `object`.
+In C the equivalent of a `Dictionary` is a `object`.
 
 JavaScript:
 
@@ -133,7 +133,7 @@ var something = {
 something["hi"] = "there";
 ```
 
-c:
+C:
 
 ```c
 #include <stdio.h>

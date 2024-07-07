@@ -1,5 +1,6 @@
 # Lambda and Closures
-C does not directly support higher-order functions like Rust. However, function pointers in C can be used to achieve similar behavior. 
+
+C does not directly support higher-order functions. However, function pointers in C can be used to achieve similar behavior.
 
 ```c
 #include <stdio.h>

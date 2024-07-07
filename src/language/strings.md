@@ -64,9 +64,9 @@ JavaScript
 let str = `Hello, \World/!`;
 ```
 
-Rust
+C
 
-```rust
+```c
 char *str = R"(Hello, \World/!)";
 ```
 

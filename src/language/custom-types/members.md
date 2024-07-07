@@ -2,7 +2,7 @@
 
 ## Constructors
 
-In C programming, constructors are not explicitly defined as in Rust. Instead, you can achieve similar functionality by using factory functions that create and initialize instances of a struct. These factory functions can be standalone functions or associated functions of the struct. Conventionally, if there is only one factory function for a struct, it is commonly named new.
+In C programming, constructors are not explicitly defined. Instead, you can achieve similar functionality by using factory functions that create and initialize instances of a struct. These factory functions can be standalone functions or associated functions of the struct. Conventionally, if there is only one factory function for a struct, it is commonly named new.
 
 ```c
 #include <stdio.h>

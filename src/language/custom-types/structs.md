@@ -1,9 +1,9 @@
 # Structures (`struct`)
 
 In JavaScript, there is no direct concept of a structure, but you can use objects to model similar structures.
-Structures in Rust:
+Structures in C:
 
-- In C, `struct` simply defines the data/fields. In C, a similar concept to rust's impl is to use struct and function to achieve similar functionality. In C, you can encapsulate data by defining structs and manipulating that data with functions, which is similar to impl in rust.
+- In C, `struct` simply defines the data/fields. Developers can encapsulate data by defining structs and manipulating that data with functions, which is similar to impl in rust.
 
 - They cannot be sub-classed.
 
@@ -32,9 +32,9 @@ int main() {
 }
 ```
 
-Value types in JavaScript are usually designed by a developer to be mutable. It's considered best practice speaking semantically, but the language does not prevent designing a `struct` that makes destructive or in-place modifications. In Rust, it's the same. A type has to be consciously developed to be immutable.
+Value types in JavaScript are usually designed by a developer to be mutable. It's considered best practice speaking semantically, but the language does not prevent designing a `struct` that makes destructive or in-place modifications. 
 
-Since Rust doesn't have classes and consequently type hierarchies based on sub-classing, shared behaviour is achieved via traits and generics and polymorphism via virtual dispatch using [trait objects].
+Since C doesn't have classes and consequently type hierarchies based on sub-classing, shared behaviour is achieved via traits and generics and polymorphism via virtual dispatch using [trait objects].
 
   [trait objects]: https://doc.rust-lang.org/book/ch17-02-trait-objects.html#using-trait-objects-that-allow-for-values-of-different-types
 
@@ -83,65 +83,68 @@ console.log(rect.area());
 console.log(rect.toString());
 ```
 
-The equivalent in Rust would be:
+The equivalent in C would be:
 
-```rust
-#![allow(dead_code)]
+```c
+#include <stdio.h>
 
-struct Rectangle {
-    x1: i32, y1: i32,
-    x2: i32, y2: i32,
+typedef struct {
+    int x1, y1, x2, y2;
+} Rectangle;
+
+int length(Rectangle rect) {
+    return rect.y2 - rect.y1;
 }
 
-impl Rectangle {
-    pub fn new(x1: i32, y1: i32, x2: i32, y2: i32) -> Self {
-        Self { x1, y1, x2, y2 }
-    }
-
-    pub fn x1(&self) -> i32 { self.x1 }
-    pub fn y1(&self) -> i32 { self.y1 }
-    pub fn x2(&self) -> i32 { self.x2 }
-    pub fn y2(&self) -> i32 { self.y2 }
-
-    pub fn length(&self) -> i32 {
-        self.y2 - self.y1
-    }
-
-    pub fn width(&self)  -> i32 {
-        self.x2 - self.x1
-    }
-
-    pub fn top_left(&self) -> (i32, i32) {
-        (self.x1, self.y1)
-    }
-
-    pub fn bottom_right(&self) -> (i32, i32) {
-        (self.x2, self.y2)
-    }
-
-    pub fn area(&self)  -> i32 {
-        self.length() * self.width()
-    }
-
-    pub fn is_square(&self)  -> bool {
-        self.width() == self.length()
-    }
+int width(Rectangle rect) {
+    return rect.x2 - rect.x1;
 }
 
-use std::fmt::*;
+int area(Rectangle rect) {
+    return length(rect) * width(rect);
+}
 
-impl Display for Rectangle {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "({}, {}), ({}, {})", self.x1, self.y2, self.x2, self.y2)
-    }
+int is_square(Rectangle rect) {
+    return width(rect) == length(rect);
+}
+
+void display(Rectangle rect) {
+    printf("(%d, %d), (%d, %d)\n", rect.x1, rect.y1, rect.x2, rect.y2);
+}
+
+int main() {
+    Rectangle rect = {0, 0, 4, 4};
+    
+    printf("Length: %d\n", length(rect));
+    printf("Width: %d\n", width(rect));
+    printf("Area: %d\n", area(rect));
+    printf("Is Square: %s\n", is_square(rect) ? "Yes" : "No");
+    
+    display(rect);
+    
+    return 0;
 }
 ```
 
-Since there is no inheritance in Rust, the way a type advertises support for some _formatted_ representation is by implementing the `Display` trait. This then enables for an instance of the structure to participate in formatting, such as shown in the call to `println!` below:
+Since there is no inheritance in C, the way a type advertises support for some _formatted_ representation is by defining a struct for Rectangle and a function to print its contents.:
 
-```rust
-fn main() {
-    let rect = Rectangle::new(12, 34, 56, 78);
-    println!("Rectangle = {rect}");
+```c
+#include <stdio.h>
+
+typedef struct {
+    int x;
+    int y;
+    int width;
+    int height;
+} Rectangle;
+
+void displayRectangle(Rectangle rect) {
+    printf("Rectangle = { x: %d, y: %d, width: %d, height: %d }\n", rect.x, rect.y, rect.width, rect.height);
+}
+
+int main() {
+    Rectangle rect = {12, 34, 56, 78};
+    displayRectangle(rect);
+    return 0;
 }
 ```

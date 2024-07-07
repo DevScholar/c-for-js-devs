@@ -12,7 +12,7 @@ class Timestamped {
 
 ```
 
-C does not have built-in support for generics like Rust. In C, preprocessor macros or void pointers are typically used to achieve a similar effect.
+C does not have built-in support for generics. In C, preprocessor macros or void pointers are typically used to achieve a similar effect.
 
 Here's a simplified example in C that mimics the Rust code using a void pointer to achieve a generic-like behavior:
 
