@@ -5,6 +5,7 @@
 There is no concept of CLI in the JavaScript standard. People often use non-browser runtimes such as Node.js and Deno to act as CLIs.
 
 There is no concept of CLI in the C standard, different IDEs and different toolchains have different CLIs.
+
 ## Building
 
 When building JavaScript, the scripts coming from dependent packages are generally co-located with the project's output assembly. C compilers compiles the project sources, except the C compiler statically links all code into a single, platform-dependent, binary.
