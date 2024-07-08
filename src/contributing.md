@@ -26,11 +26,11 @@ Making quick contributions has been made super simple. If you see an error on a 
 
 - Prefer to keep text short and use short, concise and realistic code examples to illustrate a point.
 
-- As much as it is possible, always provide and compare examples in Rust and JavaScript.
+- As much as it is possible, always provide and compare examples in C and JavaScript.
 
-- Feel free to use latest JavaScript/Rust language features if it makes an example simpler, concise and alike across the two languages.
+- Feel free to use latest JavaScript/C language features if it makes an example simpler, concise and alike across the two languages.
 
-- Avoid using community packages in JavaScript examples. Stick to the JavaScript [Global Objects] as much as possible. Since the [C Standard Library] has a much smaller API surface, it is more acceptable to call out crates for some functionality, should it be necessary for illustration (like [`rand`][rand] for random number generation), but make sure they are mature, popular and rusted.
+- Avoid using community packages in JavaScript examples. Stick to the JavaScript [Global Objects] as much as possible. Since the [C Standard Library] has a much smaller API surface, it is more acceptable to call out libraries for some functionality, should it be necessary for illustration (like [`rand`][rand] for random number generation), but make sure they are mature, popular.
 
 - Make example code as self-contained as possible and runnable (unless the idea is to illustrate a compile-time or run-time error).
 
