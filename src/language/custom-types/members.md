@@ -224,11 +224,11 @@ int main() {
 ```
 
 <!--Just like in C#, for the method in the extension trait to become available
-(2), the extension trait must be imported (1).--> Also note, the extension trait identifier `StrWrapExt` can itself be discarded via `_` at the time of import without affecting the availability of `wrap` for `String`.
+(2), the extension trait must be imported (1). Also note, the extension trait identifier `StrWrapExt` can itself be discarded via `_` at the time of import without affecting the availability of `wrap` for `String`.-->
 
 ## Visibility/Access modifiers
 
-In JavaScript, there is no explicit visibility modifier like in C#, but similar functionality can be achieved with some conventions.
+In JavaScript, there is no explicit visibility modifiers, but similar functionality can be achieved with some conventions.
 
 In C, visibility and access control are primarily achieved through the use of header files and the concept of translation units. By declaring functions and variables in header files and including them in source files, C provides a way to control visibility. To mimic private members, one can use static variables or functions within a source file, limiting their scope to that file. For public visibility, declaring functions and variables in header files and including those headers in multiple source files allows for shared access. While C lacks explicit modifiers like pub in Rust, the structuring of code using header files and source files provides a similar level of control over visibility and access.
 <!--
@@ -256,7 +256,7 @@ The table below is an approximation of the mapping of C# and Rust modifiers:
 -->
 ## Mutability
 
-When designing a type in JavaScript, it is not the responsiblity of the developer to decide whether the a type is mutable or immutable; whether it supports destructive or non-destructive mutations. In Rust, mutability is expressed on methods through the type of the parameters as shown in the example below:
+When designing a type in JavaScript, it is not the responsiblity of the developer to decide whether the a type is mutable or immutable; whether it supports destructive or non-destructive mutations. In C, mutability is expressed on methods through the type of the parameters as shown in the example below:
 
 ```c
 #include <stdio.h>
