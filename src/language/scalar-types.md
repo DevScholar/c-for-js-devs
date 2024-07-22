@@ -27,7 +27,7 @@ The following table lists the primitive types in C and their equivalent in JavaS
 
 Notes:
 
-1. [`char`][char.c] in Rust and [`string`][string.js] in JavaScript have different definitions. In Rust, a `char` is 1 bytes wide, but in JavaScript, a character is 2 bytes wide and stores the character using the UTF-16 encoding. There is no `char` type equivalent in JavaScript, only `string`. For more information, see the [C `char` documentation][char.c].  
+1. [`char`][char.c] in C and [`string`][string.js] in JavaScript have different definitions. In C, a `char` is 1 bytes wide, but in JavaScript, a character is 2 bytes wide and stores the character using the UTF-16 encoding. There is no `char` type equivalent in JavaScript, only `string`. For more information, see the [C `char` documentation][char.c].  
 2. There are only three number data type in JavaScript, `number`, which is essentially a floating point number. And the `bigint` type for storing numbers that exceed the range -(2<sup>53</sup> - 1) (`Number.MIN_SAFE_INTEGER`) to 2<sup>53</sup> - 1 (`Number.MAX_SAFE_INTEGER`). and the `bigdecimal` type for storing high-precision decimals.  
 3. For historical reasons, JavaScript has two empty data types: `null` and `undefined`. `undefined` denotes a value that was never created, and null denotes a value that was created but intentionally left empty.
 See also:
