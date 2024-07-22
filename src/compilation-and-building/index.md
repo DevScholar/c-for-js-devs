@@ -37,7 +37,7 @@ There is no concept of packages in the JavaScript standard. However, some JavaSc
 For example, adding a Node.js package reference with the Node,js CLI will add the
 dependency to the project file:
 
-  npm install linq
+  `npm install linq`
 
 The most common package registry for Node.js is [npmjs.com] .
 
