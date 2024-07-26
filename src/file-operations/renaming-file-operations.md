@@ -1,4 +1,4 @@
-# Renaming Operations
+# Renaming File Operations
 
 The following code will rename `old_name.txt` to `new_name.txt`.
 

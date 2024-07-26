@@ -1,4 +1,4 @@
-# Deleting Operations
+# Deleting File Operations
 
 The following code will delete `test.txt`.
 
