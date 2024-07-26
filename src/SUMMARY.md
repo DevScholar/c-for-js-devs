@@ -47,7 +47,7 @@
 - [Compilation and Building](./compilation-and-building/index.md)
 - [File Operations](./file-operations/index.md)
   - [Text File Operations](./file-operations/text-file-operations.md)
-  - [Binary File Operations](./file-operations/text-file-operations.md)
+  - [Binary File Operations](./file-operations/binary-file-operations.md)
   - [Copying File Operations](./file-operations/copying-file-operations.md)
   - [Renaming File Operations](./file-operations/renaming-file-operations.md)
   - [Moving File Operations](./file-operations/moving-file-operations.md)
