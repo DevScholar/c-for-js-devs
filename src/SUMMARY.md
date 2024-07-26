@@ -52,4 +52,4 @@
   - [Renaming File Operations](./file-operations/renaming-file-operations.md)
   - [Moving File Operations](./file-operations/moving-file-operations.md)
   - [Deleting File Operations](./file-operations/deleting-file-operations.md)
-  - [Folder Operations](./file-operations/folder-operations.md)
+  - [Creating Folder Operations](./file-operations/creating-folder-operations.md)
